@@ -32,21 +32,25 @@ void Input_Controller::handleMouseButton(int button, int action, int /*mods*/)
         int width, height;
         glfwGetWindowSize(window, &width, &height);
         
+        
         // Texture Coordinates
         float texX = 200.0f;  
-        float texY = 200.0f;    
+        float texY = 150.0f;    
         float texWidth = 400.0f;
-        float texHeight = 400.0f;
+        float texHeight = 300.0f;
 
         // Read the mouse position in window coordinates
         double mouseX, mouseY;
         glfwGetCursorPos(window, &mouseX, &mouseY);
 
+        std::cout << "X: " << mouseX << " Y: " << mouseY << std::endl;
+
+
         // Compute texture-relative normalized coordinates:
         float normalizedTexX = (static_cast<float>(mouseX) - texX) / texWidth;
         float normalizedTexY = ( 1 - (static_cast<float>(mouseY) - texY) / texHeight);
         
-        std::cout << "normX: " << normalizedTexX << " normY: " << normalizedTexY << std::endl;
+        // std::cout << "normX: " << normalizedTexX << " normY: " << normalizedTexY << std::endl;
 
         m_lastClickPos = glm::vec2(normalizedTexX, normalizedTexY);
     }
