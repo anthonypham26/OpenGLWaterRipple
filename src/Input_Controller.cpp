@@ -1,6 +1,6 @@
 #include "Input_Controller.h"
-#include <iostream>     // For debugging/printing if needed
-#include <algorithm>    // For std::clamp (if you use it)
+#include <iostream>     // For debugging/printing
+#include <algorithm>    // For std::clamp 
 
 
 // ---------------------------------------------------------
@@ -31,18 +31,24 @@ void Input_Controller::handleMouseButton(int button, int action, int /*mods*/)
         GLFWwindow* window = glfwGetCurrentContext();
         int width, height;
         glfwGetWindowSize(window, &width, &height);
+        
+        // Texture Coordinates
+        float texX = 200.0f;  
+        float texY = 200.0f;    
+        float texWidth = 400.0f;
+        float texHeight = 400.0f;
 
         // Read the mouse position in window coordinates
         double mouseX, mouseY;
         glfwGetCursorPos(window, &mouseX, &mouseY);
 
-        // Convert [0..width], [0..height] => [-1..1], [-1..1]
-        float normalizedX = static_cast<float>(mouseX) / static_cast<float>(width)  * 2.0f - 1.0f;
-        float normalizedY = 1.0f - (static_cast<float>(mouseY) / static_cast<float>(height));
-        normalizedY = normalizedY * 2.0f - 1.0f;
+        // Compute texture-relative normalized coordinates:
+        float normalizedTexX = (static_cast<float>(mouseX) - texX) / texWidth;
+        float normalizedTexY = ( 1 - (static_cast<float>(mouseY) - texY) / texHeight);
+        
+        std::cout << "normX: " << normalizedTexX << " normY: " << normalizedTexY << std::endl;
 
-        // Store click position
-        m_lastClickPos = glm::vec2(normalizedX, normalizedY);
+        m_lastClickPos = glm::vec2(normalizedTexX, normalizedTexY);
     }
 }
 

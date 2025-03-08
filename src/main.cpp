@@ -15,14 +15,14 @@
 // Vertices coordinates
 GLfloat vertices[] =
 { //     COORDINATES     /        COLORS      /   TexCoord  //
-	-0.5f, -0.5f, 0.0f,     0.0f, 0.0f, 1.0f,	-1.0f, -1.0f, // Lower left corner
-	-0.5f,  0.5f, 0.0f,     1.0f, 1.0f, 1.0f,	-1.0f,  1.0f, // Upper left corner
-	 0.5f,  0.5f, 0.0f,     1.0f, 0.0f, 0.0f,	 1.0f,  1.0f, // Upper right corner
-	 0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 1.0f, 	 1.0f, -1.0f  // Lower right corner//
-	//-0.5f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f,	0.0f, 0.0f, // Lower left corner
-	//-0.5f,  0.5f, 0.0f,     0.0f, 1.0f, 0.0f,	0.0f, 1.0f, // Upper left corner
-	// 0.5f,  0.5f, 0.0f,     0.0f, 0.0f, 1.0f,	1.0f, 1.0f, // Upper right corner
-	// 0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 1.0f,	1.0f, 0.0f  // Lower right corner
+	// -0.5f, -0.5f, 0.0f,     0.0f, 0.0f, 1.0f,	-1.0f, -1.0f, // Lower left corner
+	// -0.5f,  0.5f, 0.0f,     1.0f, 1.0f, 1.0f,	-1.0f,  1.0f, // Upper left corner
+	//  0.5f,  0.5f, 0.0f,     1.0f, 0.0f, 0.0f,	 1.0f,  1.0f, // Upper right corner
+	//  0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 1.0f, 	 1.0f, -1.0f  // Lower right corner // This is 4 Photos, 4 corners 
+	-0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 1.0f,	0.0f, 0.0f, // Lower left corner
+	-0.5f,  0.5f, 0.0f,     1.0f, 1.0f, 1.0f,	0.0f, 1.0f, // Upper left corner
+	0.5f,  0.5f, 0.0f,     1.0f, 1.0f, 1.0f,	1.0f, 1.0f, // Upper right corner
+	0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 1.0f,	1.0f, 0.0f  // Lower right corner
 };
 
 // Indices for vertices order
@@ -65,12 +65,13 @@ int main()
 	GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
 
 	// Image Handling
-	std::string texPath = "../include/texture/AnthonyMackie.png";
+	std::string texPath = "../include/texture/water.png";
 	Texture myPhoto((texPath).c_str(), GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE); // loads the image file, creates an OpenGL texture, and configures its parameters
 	myPhoto.texUnit(shaderProgram, "tex0", 0); // This is how the fragment shader knows which texture to sample when it sees uniform sampler2D tex0
 	
 	//to add animation to the texture from glsl fragment shader 
-	GLuint u_timeLoc = glGetUniformLocation(shaderProgram.ID, "u_time");
+	GLuint u_programTimeLoc = glGetUniformLocation(shaderProgram.ID, "u_programTime");
+	GLuint u_timeOfClickLoc = glGetUniformLocation(shaderProgram.ID, "u_timeOfClick");
 	GLuint u_mousePosLoc = glGetUniformLocation(shaderProgram.ID, "u_mousePos");
 	// GLuint u_basicTextureLocation = glGetUniformLocation(shaderProgram.ID, "basictexture");
 
@@ -78,7 +79,7 @@ int main()
 	Input_Controller controller;
 	glfwSetWindowUserPointer(window, &controller);
 	glfwSetMouseButtonCallback(window, Input_Controller::mouseButtonCallback);
-
+	
 	// ---------------------------------------------------------------------------------- //
 	// Generates Vertex Array Object and binds it
 	VAO VAO1;
@@ -97,25 +98,24 @@ int main()
 	EBO1.Unbind();
 	// ---------------------------------------------------------------------------------- //
 
-
-	//float lastFrameTime = glfwGetTime();
-
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
-		float clickTime = controller.getLastClickTime();
+		// Get and Set the position of the Mouse Click
 		glm::vec2 clickPos = controller.getLastClickPos();
-		glUniform1f(u_timeLoc, clickTime);
 		glUniform2f(u_mousePosLoc, clickPos.x, clickPos.y);
+
+		// Get and Set the time of the Mouse Click
+		float clickTime = controller.getLastClickTime();
+		glUniform1f(u_timeOfClickLoc, clickTime);
+
+		// Get and Set the time of the Program
+		float timeValue = glfwGetTime();
+		glUniform1f(u_programTimeLoc, timeValue);
 
 		glActiveTexture(GL_TEXTURE0);
 
-		//update the time uniform
-		float timeValue = glfwGetTime(); // Gets the current time
-		glUniform1f(u_timeLoc, timeValue);
-
-		// Specify the color of the background
-		glClearColor(0.75f, 0.07f, 0.12f, 0.1f);
+		glClearColor(0.5569f, 0.7922f, 0.9020f, 1.0f); // Specify the color of the background
 		glClear(GL_COLOR_BUFFER_BIT);	// Clean the back buffer and assign the new color to it
 
 		shaderProgram.Activate(); // Tell OpenGL which Shader Program we want to use
@@ -148,6 +148,7 @@ int main()
 	glfwTerminate();
 	return 0;
 
+	// Catch any exceptions that were thrown in the try block
 	} catch (int e) {
 		std::cerr << "Caught exception: " << e << std::endl;
 	} catch (const std::exception& e) {

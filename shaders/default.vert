@@ -10,5 +10,5 @@ out vec2 TexCoord;     // Pass texture coordinates to fragment shader
 void main() {
     gl_Position = vec4(aPos, 1.0);
     fragColor = aColor;
-    TexCoord = vec2(aTexCoord.x, 1.0 - aTexCoord.y);  // Flip texture coordinates if needed
+    TexCoord = vec2(aTexCoord.x, aTexCoord.y);
 }
